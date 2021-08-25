@@ -6,36 +6,46 @@ import java.time.LocalDateTime;
 
 public class Expense implements IExpense {
 
-    private IExpenseCategory category;
-    private double sum;
+    private int id;
+    private ExpenseCategory category;
+    private double amount;
     private Currency currency;
     private String description;
     private LocalDateTime date;
 
-    public Expense(IExpenseCategory category, int sum, Currency currency, String description) {
+    public Expense(ExpenseCategory category, double sum, Currency currency, String description, LocalDateTime date) throws CostManagerException {
         setCategory(category);
-        setSum(sum);
+        setAmount(sum);
         setCurrency(currency);
         setDescription(description);
+        setLocalDate(date);
     }
 
-    public IExpenseCategory getCategory() {
+    public ExpenseCategory getCategory() {
         return category;
     }
 
-    public void setCategory(IExpenseCategory category) {
+    public void setCategory(ExpenseCategory category) {
         this.category = category;
     }
 
-    public double getSum() {
-        return sum;
+    public double getAmount() {
+        return amount;
     }
 
-    public void setSum(double sum) throws CostManagerException {
-        if (sum < 0) {
+    public void setAmount(double amount) throws CostManagerException {
+        if (amount < 0) {
             throw new CostManagerException("Cost should be a positive double");
         }
-        this.sum = sum;
+        this.amount = amount;
+    }
+
+    public void setId(int Id) {
+        this.id = Id;
+    }
+
+    public void setLocalDate(LocalDateTime Date) {
+        this.date = Date;
     }
 
     public Currency getCurrency() {
@@ -48,6 +58,14 @@ public class Expense implements IExpense {
 
     public String getDescription() {
         return description;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
     }
 
     public void setDescription(String description) {
