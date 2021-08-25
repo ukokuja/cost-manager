@@ -9,6 +9,5 @@ public interface IManager {
     public abstract List<? extends Expense> getReport(LocalDateTime a, LocalDateTime b);
     public abstract void createExpensessTable();
     public abstract void createCategoriesTable();
-    public abstract void printQuery(String query);
 
 }

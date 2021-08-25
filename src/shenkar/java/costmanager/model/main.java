@@ -12,18 +12,18 @@ public class main {
         Manager test=new Manager();
         ExpenseCategory cat = new ExpenseCategory("Food");
         Currency NIS = Currency.NIS;
-        Currency USD = Currency.USD;
-        LocalDateTime datetime1 = LocalDateTime.now();
+        LocalDateTime datetime_a = LocalDateTime.now().minusDays(2);
+        LocalDateTime datetime_b = LocalDateTime.now();
         Expense ex1 = null;
         try {
-            ex1 = new Expense(cat,10,NIS,"Hamburger" , datetime1);
+            ex1 = new Expense(cat,10,NIS,"Hamburger" , datetime_b);
         } catch (CostManagerException e) {
             e.printStackTrace();
         }
-        test.createCategoriesTable();
-        test.createExpensessTable();
-        test.addExpenseCategory(cat);
-        test.addExpense(ex1);
+
+        for (Expense e : test.getReport(datetime_a, datetime_b)) {
+            System.out.println(e);
+        }
 
 //        test.printQuery("select * from expense");
     }

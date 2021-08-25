@@ -2,6 +2,7 @@ package shenkar.java.costmanager.model;
 
 import shenkar.java.costmanager.CostManagerException;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 
 public class Expense implements IExpense {
@@ -13,9 +14,19 @@ public class Expense implements IExpense {
     private String description;
     private LocalDateTime date;
 
-    public Expense(ExpenseCategory category, double sum, Currency currency, String description, LocalDateTime date) throws CostManagerException {
+    public Expense(ExpenseCategory category, double amount, Currency currency, String description, LocalDateTime date) throws CostManagerException {
+        setId(-1);
         setCategory(category);
-        setAmount(sum);
+        setAmount(amount);
+        setCurrency(currency);
+        setDescription(description);
+        setLocalDate(date);
+    }
+
+    public Expense(int id, ExpenseCategory category, double amount, Currency currency, String description, LocalDateTime date) throws CostManagerException {
+        setId(id);
+        setCategory(category);
+        setAmount(amount);
         setCurrency(currency);
         setDescription(description);
         setLocalDate(date);
@@ -70,5 +81,17 @@ public class Expense implements IExpense {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Expense{" +
+                "id=" + id +
+                ", category=" + category +
+                ", amount=" + amount +
+                ", currency=" + currency +
+                ", description='" + description + '\'' +
+                ", date=" + date +
+                '}';
     }
 }

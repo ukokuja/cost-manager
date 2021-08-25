@@ -1,7 +1,14 @@
 package shenkar.java.costmanager.model;
 
+import shenkar.java.costmanager.CostManagerException;
+
 import java.time.LocalDateTime;
 import java.sql.*;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.util.LinkedList;
 import java.util.List;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -21,10 +28,10 @@ public class Manager implements IManager {
             Connection connection = DriverManager.getConnection(JDBC_URL);
             //connection.createStatement().execute("create table expense(ID varchar(20), category varchar(20), sum decimal(5,2),currency varchar(3), date varchar(20), description varchar(100))");
             connection.createStatement().execute("insert into EXPENSE (CATEGORY_ID, CURRENCY, AMOUNT, DATE, DESCRIPTION)" +
-                    " VALUES (" + expense.getCategory().getId()  +
+                    " VALUES (" + expense.getCategory().getId() +
                     ", '" + expense.getCurrency() +
                     "', " + expense.getAmount() +
-                    ", '" + expense.getDate() +
+                    ", '" + Timestamp.valueOf(expense.getDate()) +
                     "', '" + expense.getDescription() + "')");
             connection.close();
         } catch (SQLException | ClassNotFoundException e) {
@@ -55,7 +62,34 @@ public class Manager implements IManager {
 
     @Override
     public List<? extends Expense> getReport(LocalDateTime a, LocalDateTime b) {
-        return null;
+        List<Expense> expenses = new LinkedList<>();
+        try {
+            Class.forName(DRIVER);
+            Connection connection = DriverManager.getConnection(JDBC_URL);
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "select * from expense ee left join category cc on ee.category_id = cc.id" +
+                            " where ee.DATE BETWEEN ? and ?", Statement.RETURN_GENERATED_KEYS);
+            DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                    .appendPattern("yyyy-MM-dd HH:mm:ss")
+                    .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
+                    .toFormatter();
+            pstmt.setString(1, a.format(formatter));
+            pstmt.setString(2, b.format(formatter));
+            pstmt.executeQuery();
+
+            ResultSet rs = pstmt.getResultSet();
+            while (rs.next()) {
+                ExpenseCategory ec = new ExpenseCategory(rs.getInt(7), rs.getString(8));
+
+                LocalDateTime dateTime = LocalDateTime.parse(rs.getString(5), formatter);
+                Expense expense = new Expense(rs.getInt(1), ec, rs.getDouble(3), Currency.valueOf(rs.getString(4)), rs.getString(6), dateTime);
+                expenses.add(expense);
+            }
+            connection.close();
+        } catch (SQLException | ClassNotFoundException | CostManagerException e) {
+            e.printStackTrace();
+        }
+        return expenses;
     }
 
     @Override
@@ -69,12 +103,13 @@ public class Manager implements IManager {
                             "category_id int NOT NULL, " +
                             "amount decimal(5,2)," +
                             "currency varchar(3), " +
-                            "date varchar(63), " +
+                            "date TIMESTAMP, " +
                             "description varchar(100)," +
                             "CONSTRAINT expense_id PRIMARY KEY (id)," +
                             "CONSTRAINT category_id FOREIGN KEY (ID) REFERENCES category(ID))");
             connection.close();
         } catch (SQLException e) {
+            // Table exist error
             if (e.getSQLState().equals("X0Y32"))
                 return;
             e.printStackTrace();
@@ -108,31 +143,4 @@ public class Manager implements IManager {
     public Manager() {
     }
 
-    public void printQuery(String query) {
-        try {
-            Class.forName(DRIVER);
-            Connection connection = DriverManager.getConnection(JDBC_URL);
-
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-            int columnCount = resultSetMetaData.getColumnCount();
-
-            for (int i = 1; i <= columnCount; i++) {
-                System.out.format("%20s", resultSetMetaData.getColumnName(i) + " | ");
-            }
-            while (resultSet.next()) {
-                System.out.println("");
-                for (int i = 1; i <= columnCount; i++) {
-                    System.out.format("%20s", resultSet.getString(i) + " | ");
-                }
-            }
-            //CLOSE CONNECTION
-            statement.close();
-            connection.close();
-
-        } catch (SQLException | ClassNotFoundException exeption) {
-            System.out.println("Exception: " + exeption);
-        }
-    }
 }
