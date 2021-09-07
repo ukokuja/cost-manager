@@ -1,6 +1,6 @@
 package shenkar.java.costmanager.model;
 
-public interface IExpenseCategory {
-
-
-}
+/**
+ * Expense Category interface
+ */
+public interface IExpenseCategory {}

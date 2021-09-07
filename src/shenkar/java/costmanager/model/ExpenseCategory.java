@@ -1,18 +1,29 @@
 package shenkar.java.costmanager.model;
-import  shenkar.java.costmanager.model.*;
 
 import java.util.Objects;
 
+/**
+ * Expense category implementation
+ */
 public class ExpenseCategory implements IExpenseCategory {
 
     private int id;
     private String name;
 
+    /**
+     * Constructor when id is unknown
+     * @param name: category name
+     */
     public ExpenseCategory(String name) {
         setId(-1);
         setName(name);
     }
 
+    /**
+     * Constructor when id is known
+     * @param id: category id
+     * @param name: category name
+     */
     public ExpenseCategory(int id, String name) {
         setId(id);
         setName(name);

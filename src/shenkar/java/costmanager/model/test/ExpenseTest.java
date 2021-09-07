@@ -1,22 +1,21 @@
 package shenkar.java.costmanager.model.test;
-import shenkar.java.costmanager.model.ExpenseCategory;
-import shenkar.java.costmanager.model.Currency;
-import shenkar.java.costmanager.model.Expense;
-import shenkar.java.costmanager.CostManagerException;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import shenkar.java.costmanager.CostManagerException;
+import shenkar.java.costmanager.model.Currency;
+import shenkar.java.costmanager.model.Expense;
+import shenkar.java.costmanager.model.ExpenseCategory;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for all the CostItem class functionality
+ * Unit tests for all the Expense class functionality
  */
-class CostItemTest {
+class ExpenseTest {
 
     private Expense costItem = null;
     private ExpenseCategory category = null;
@@ -24,7 +23,7 @@ class CostItemTest {
     @BeforeEach
     void setUp() throws CostManagerException {
         category = new ExpenseCategory("shopping");
-        costItem = new Expense(category, 550, Currency.NIS, "shoe shopping", LocalDateTime.of(2020,11,12, 10, 10, 10));
+        costItem = new Expense(category, 550, Currency.NIS, "shoe shopping", LocalDateTime.of(2020, 11, 12, 10, 10, 10));
     }
 
     @AfterEach
@@ -51,7 +50,7 @@ class CostItemTest {
     @Test
     void getAmount() {
         double expected = 550;
-        double actual  = costItem.getAmount();
+        double actual = costItem.getAmount();
         assertEquals(expected, actual);
     }
 
@@ -79,17 +78,17 @@ class CostItemTest {
     void testToString() {
 
         String expected = "Expense{" +
-                "id=-1"  +
+                "id=-1" +
                 ", category=ExpenseCategory{" +
                 "id=-1" +
                 ", name='shopping'" +
                 '}' +
-                ", amount=550.0"  +
+                ", amount=550.0" +
                 ", currency=NIS" +
                 ", description='shoe shopping'" +
                 ", date=2020-11-12T10:10:10" +
                 '}';
         String actual = costItem.toString();
-        assertEquals(expected,actual);
+        assertEquals(expected, actual);
     }
 }

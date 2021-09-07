@@ -1,11 +1,11 @@
 package shenkar.java.costmanager.model.test;
-import shenkar.java.costmanager.model.ExpenseCategory;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import shenkar.java.costmanager.model.ExpenseCategory;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for all the Category class functionality
