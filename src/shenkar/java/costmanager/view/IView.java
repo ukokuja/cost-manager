@@ -13,8 +13,7 @@ import java.util.List;
  */
 public interface IView {
 
-    public abstract void displayCostItemTable(List<Expense> cs);
-    public abstract void displayCategoriesChart(String[] catNames, double[] sums);
+    public abstract void displayExpenseTable(List<Expense> cs);
     public abstract void displayCategoriesSelect(ExpenseCategory[] catNames);
     public abstract void displayCurrenciesSelect(String[] currencies);
 

@@ -85,6 +85,7 @@ public class ViewModel implements IViewModel {
                 String message = "";
                 try {
                     //Add the cost item to db by calling the model
+                    model.createExpensessTable();
                     model.addExpense(item);
                     //If the operation was done successfully show this message
                     message = "New cost: " + item.toString() + "  was added successfully";
@@ -120,7 +121,7 @@ public class ViewModel implements IViewModel {
                     e.printStackTrace();
                 }
                 //If the operation was done successfully show the table
-                view.displayCostItemTable(tableInfo);
+                view.displayExpenseTable(tableInfo);
             }
         });
     }
