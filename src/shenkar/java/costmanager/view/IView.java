@@ -1,6 +1,7 @@
 package shenkar.java.costmanager.view;
 
 import shenkar.java.costmanager.model.Expense;
+import shenkar.java.costmanager.model.ExpenseCategory;
 import shenkar.java.costmanager.viewModel.IViewModel;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 public interface IView {
 
     public abstract void displayExpenseTable(List<Expense> cs);
-    public abstract void displayCategoriesSelect(String[] catNames);
+    public abstract void displayCategoriesSelect(ExpenseCategory[] catNames);
     public abstract void displayCurrenciesSelect(String[] currencies);
 
     public abstract void showMessage(String message);

@@ -47,10 +47,7 @@ public class ExpenseCategory implements IExpenseCategory {
 
     @Override
     public String toString() {
-        return "ExpenseCategory{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
+        return name;
     }
 
     @Override
