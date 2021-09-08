@@ -85,6 +85,7 @@ public class ViewModel implements IViewModel {
                 String message = "";
                 try {
                     //Add the cost item to db by calling the model
+                    model.createExpensessTable();
                     model.addExpense(item);
                     //If the operation was done successfully show this message
                     message = "New cost: " + item.toString() + "  was added successfully";
@@ -120,7 +121,7 @@ public class ViewModel implements IViewModel {
                     e.printStackTrace();
                 }
                 //If the operation was done successfully show the table
-                view.displayCostItemTable(tableInfo);
+                view.displayExpenseTable(tableInfo);
             }
         });
     }
@@ -140,6 +141,7 @@ public class ViewModel implements IViewModel {
                 //Get list of all existing categories in our db by calling the model
                 List<ExpenseCategory> categoryList = null;
                 try {
+                    model.createCategoriesTable();
                     categoryList = model.getAllCategories();
                 } catch (CostManagerException e) {
                     e.printStackTrace();

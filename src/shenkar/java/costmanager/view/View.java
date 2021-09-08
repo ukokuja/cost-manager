@@ -49,7 +49,7 @@ public class View implements IView {
      * of the expense items.
      * @param cs - list of expense item to display in the table.
      */
-    public void displayCostItemTable(List<Expense> cs) {
+    public void displayExpenseTable(List<Expense> cs) {
 
         String[][] table = new String[cs.size()][5];
 
@@ -64,18 +64,6 @@ public class View implements IView {
         }
         View.this.ui.updateTable(table);
     }
-
-    @Override
-    public void displayCategoriesChart(String[] catNames, double[] sums) {
-
-    }
-
-    /**
-     * Calls to the updateChart() method in order to update the pie chart
-     * of the categories sum.
-     * @param catNames - String array of all the category names to display in the chart
-     * @param sums - Double array of all the sums of the co-related categories in catNames.
-     */
 
     /**
      * Display the categories in the select drop list of "Add Cost Panel".
@@ -170,7 +158,6 @@ public class View implements IView {
         public void start() {
             displayMainMenu();
         }
-
         /**
          * Sets the screen to be the main panel, this method called
          * in the start() method when the application starts running.
@@ -194,7 +181,6 @@ public class View implements IView {
             frame.setVisible(true);
         }
 
-
         /**
          * This panel is used as the home screen of the application,
          * where the user can navigate through a menu with all the actions he can take in the application.
@@ -206,7 +192,7 @@ public class View implements IView {
             //Buttons for navigating to other panels of the application
             private JButton btAddCostItem;
             private JButton btAddCategory;
-            private JButton btDisplayPie;
+            private JButton btDisplayBetweenDates;
             private JButton btDisplayTable;
 
             //Used to display messages to the user
@@ -228,7 +214,7 @@ public class View implements IView {
 
                 btAddCostItem = new JButton("Add Cost");
                 btAddCategory = new JButton("Add Category");
-                btDisplayPie = new JButton("Display Pie Chart");
+                btDisplayBetweenDates = new JButton("Display expenses between dates");
                 btDisplayTable = new JButton("Display Table");
 
                 jlMessage = new JLabel("Message Board");
@@ -241,7 +227,7 @@ public class View implements IView {
 
                 buttons.add(btAddCostItem, gbc);
                 buttons.add(btAddCategory, gbc);
-                buttons.add(btDisplayPie, gbc);
+                buttons.add(btDisplayBetweenDates, gbc);
                 buttons.add(btDisplayTable, gbc);
                 messageBoard.add(jlMessage, gbc);
                 messageBoard.add(scroll, gbc);
@@ -277,11 +263,11 @@ public class View implements IView {
                 });
 
                 //Sends the user to the select dates panel when pressed on Display Pie Chart button
-                btDisplayPie.addActionListener(new ActionListener() {
+                btDisplayBetweenDates.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         ApplicationUI.this.dateChoosePanel.cleanInputs();
-                        ApplicationUI.this.dateChoosePanel.updateButton("pie chart");
+                        ApplicationUI.this.dateChoosePanel.updateButton("Expeneses between dates");
                         ApplicationUI.this.replaceScreen(ApplicationUI.this.dateChoosePanel);
                     }
                 });
@@ -353,7 +339,6 @@ public class View implements IView {
                 btSubmit.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-
                         String category = cbChooseCategory.getSelectedItem().toString();
                         String currencyStr = cbChooseCurrency.getSelectedItem().toString();
 
@@ -375,10 +360,11 @@ public class View implements IView {
 
                         try {
                             //Trying to add data to DB
-                            DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                                    .appendPattern("yyyy-MM-dd HH:mm:ss")
-                                    .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
-                                    .toFormatter();
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                            //DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                                    //.appendPattern("yyyy-MM-dd HH:mm:ss")
+                                    //.appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
+                                    //.toFormatter();
                             LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
                             Expense cs = new Expense(new ExpenseCategory(category), amount, currencyEnum, description, dateTime);
                             View.this.vm.addCostItem(cs);
@@ -429,10 +415,11 @@ public class View implements IView {
                 tfEnterDescription.setFont(myFont);
 
                 //Setting a format for the date field in the form
-                DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                        .appendPattern("yyyy-MM-dd HH:mm:ss")
-                        .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
-                        .toFormatter();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                //DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                        //.appendPattern("yyyy-MM-dd HH:mm:ss")
+                        //.appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
+                        //.toFormatter();
                 jlDate = new JLabel("Enter date (yyyy-MM-dd HH:mm:ss):");
                 tfDate = new JFormattedTextField(formatter);
                 tfDate.setFont(myFont);
@@ -649,13 +636,16 @@ public class View implements IView {
                     //reading dates from text box
                     String fromDate = tfFromDate.getText();
                     String toDate = tfToDate.getText();
-                    DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                            .appendPattern("yyyy-MM-dd HH:mm:ss")
-                            .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
-                            .toFormatter();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                    //DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                            //.appendPattern("yyyy-MM-dd HH:mm:ss")
+                            //.appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
+                            //.toFormatter();
 
                     if (buttonName.equals("table")) {
                         //sending dates to viewmodel to query the model and present the data in the app
+                        LocalDateTime date1 = LocalDateTime.parse(fromDate, formatter);
+                        LocalDateTime date2 = LocalDateTime.parse(toDate, formatter);
                         View.this.vm.getCostsForTable(LocalDateTime.parse(fromDate, formatter), LocalDateTime.parse(toDate, formatter));
 
                         //rendering the table panel
@@ -679,10 +669,11 @@ public class View implements IView {
                 Font myFont = new Font("Default", Font.PLAIN, 12);
 
                 //Setting a format to the date fields
-                DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                        .appendPattern("yyyy-MM-dd HH:mm:ss")
-                        .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
-                        .toFormatter();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                //DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                        //.appendPattern("yyyy-MM-dd HH:mm:ss")
+                        //.appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
+                        //.toFormatter();
                 tfFromDate = new JFormattedTextField(formatter);
                 tfToDate = new JFormattedTextField(formatter);
                 tfFromDate.setFont(myFont);
