@@ -138,20 +138,14 @@ public class ViewModel implements IViewModel {
             @Override
             public void run() {
                 //Get list of all existing categories in our db by calling the model
-                List<ExpenseCategory> categoryList = null;
+                ExpenseCategory[] categoryList = null;
                 try {
-                    categoryList = model.getAllCategories();
+                    categoryList = model.getAllCategories().toArray(new ExpenseCategory[0]);
+                    view.displayCategoriesSelect(categoryList);
                 } catch (CostManagerException e) {
                     e.printStackTrace();
                 }
-                //Creating array in order to send it to the view
-                String[] categoriesNames = new String[categoryList.size()];
-                //Fill the array with all the category names in the list
-                for (int i = 0; i < categoryList.size(); i++) {
-                    categoriesNames[i] = categoryList.get(i).getName();
-                }
-                //If the operation was done send the categories names to the view
-                view.displayCategoriesSelect(categoriesNames);
+
             }
         });
     }

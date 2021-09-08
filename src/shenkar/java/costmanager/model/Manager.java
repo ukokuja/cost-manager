@@ -20,6 +20,15 @@ public class Manager implements IManager {
     public static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
     public static final String JDBC_URL = "jdbc:derby:MyLifeDB;create=true";
 
+    public Manager() {
+        try {
+            createCategoriesTable();
+            createExpensessTable();
+        } catch (CostManagerException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Inserts expense into the DB
      * @param expense: Expense instance to add
@@ -28,12 +37,16 @@ public class Manager implements IManager {
     public void addExpense(Expense expense) throws CostManagerException {
         Connection connection = getConnection();
         try {
-            connection.createStatement().execute("insert into EXPENSE (CATEGORY_ID, CURRENCY, AMOUNT, DATE, DESCRIPTION)" +
+            PreparedStatement pstmt = connection.prepareStatement("insert into EXPENSE (CATEGORY_ID, CURRENCY, AMOUNT, DATE, DESCRIPTION)" +
                     " VALUES (" + expense.getCategory().getId() +
                     ", '" + expense.getCurrency() +
                     "', " + expense.getAmount() +
                     ", '" + Timestamp.valueOf(expense.getDate()) +
                     "', '" + expense.getDescription() + "')");
+            pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            rs.next();
+            expense.setId(rs.getInt(1));
             connection.close();
         } catch (SQLException e) {
             throw new CostManagerException("Could not add expense", e);
@@ -125,7 +138,7 @@ public class Manager implements IManager {
                             "date TIMESTAMP, " +
                             "description varchar(100)," +
                             "CONSTRAINT expense_id PRIMARY KEY (id)," +
-                            "CONSTRAINT category_id FOREIGN KEY (ID) REFERENCES category(ID))");
+                            "CONSTRAINT category_id FOREIGN KEY (category_id) REFERENCES category(ID))");
             connection.close();
         } catch (SQLException e) {
             // Table exist error

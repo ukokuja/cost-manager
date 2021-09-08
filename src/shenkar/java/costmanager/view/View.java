@@ -24,6 +24,10 @@ import java.util.List;
 public class View implements IView {
     private IViewModel vm;
     private ApplicationUI ui;
+    private final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd HH:mm:ss")
+            .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
+            .toFormatter();
 
     /**
      * The View constructor sets the UI using the ApplicationUI inner class,
@@ -81,7 +85,7 @@ public class View implements IView {
      * Display the categories in the select drop list of "Add Cost Panel".
      * @param catNames
      */
-    public void displayCategoriesSelect(String[] catNames) {
+    public void displayCategoriesSelect(ExpenseCategory[] catNames) {
         View.this.ui.updateCategoriesSelect(catNames);
     }
 
@@ -159,7 +163,7 @@ public class View implements IView {
         public void updateTable(String[][] table) {
             this.tablePanel.updateTableData(table);
         }
-        public void updateCategoriesSelect(String[] catNames) {
+        public void updateCategoriesSelect(ExpenseCategory[] catNames) {
             this.addCostPanel.updateCategories(catNames);
         }
         public void updateCurrenciesSelect(String[] currencies) {
@@ -319,8 +323,8 @@ public class View implements IView {
             private Font myFont;
 
             //Used for the select drop list in the form
-            private String[] categoriesOptions;
-            private DefaultComboBoxModel<String> defaultCBCategories;
+            private ExpenseCategory[] categoriesOptions;
+            private DefaultComboBoxModel<ExpenseCategory> defaultCBCategories;
 
             private String[] currencyOptions;
             private DefaultComboBoxModel<String> defaultCBCurrencies;
@@ -354,7 +358,7 @@ public class View implements IView {
                     @Override
                     public void actionPerformed(ActionEvent e) {
 
-                        String category = cbChooseCategory.getSelectedItem().toString();
+                        ExpenseCategory category = (ExpenseCategory) cbChooseCategory.getSelectedItem();
                         String currencyStr = cbChooseCurrency.getSelectedItem().toString();
 
                         Currency currencyEnum;
@@ -375,12 +379,8 @@ public class View implements IView {
 
                         try {
                             //Trying to add data to DB
-                            DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                                    .appendPattern("yyyy-MM-dd HH:mm:ss")
-                                    .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
-                                    .toFormatter();
                             LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
-                            Expense cs = new Expense(new ExpenseCategory(category), amount, currencyEnum, description, dateTime);
+                            Expense cs = new Expense(category, amount, currencyEnum, description, dateTime);
                             View.this.vm.addCostItem(cs);
                         } catch (CostManagerException err) {
 
@@ -403,7 +403,7 @@ public class View implements IView {
                 gbc.fill = GridBagConstraints.BOTH;
 
                 //Creating a JComboBox in order to initialize the select drop list
-                categoriesOptions = new String[0];
+                categoriesOptions = new ExpenseCategory[0];
                 View.this.vm.getCategories();
                 defaultCBCategories = new DefaultComboBoxModel<>(categoriesOptions);
                 cbChooseCategory = new JComboBox(defaultCBCategories);
@@ -464,19 +464,19 @@ public class View implements IView {
                 tfEnterDescription.setText("");
                 cbChooseCategory.setSelectedIndex(-1);
                 cbChooseCurrency.setSelectedIndex(-1);
-                tfDate.setText("");
+                tfDate.setText(LocalDateTime.now().format(formatter));
             }
 
             /**
              * Updates the values of the select drop list of the categories
              * @param catNames
              */
-            public void updateCategories(String[] catNames) {
+            public void updateCategories(ExpenseCategory[] catNames) {
                 this.categoriesOptions = catNames;
 
                 this.defaultCBCategories.removeAllElements();
-                for (String name : this.categoriesOptions) {
-                    this.defaultCBCategories.addElement(name);
+                for (ExpenseCategory category : this.categoriesOptions) {
+                    this.defaultCBCategories.addElement(category);
                 }
                 this.cbChooseCategory.setSelectedIndex(-1);
 
@@ -709,8 +709,8 @@ public class View implements IView {
             }
 
             public void cleanInputs() {
-                tfToDate.setText("");
-                tfFromDate.setText("");
+                tfFromDate.setValue("2000-01-01 00:00:00");
+                tfToDate.setValue(LocalDateTime.now().format(formatter));
             }
 
         }
