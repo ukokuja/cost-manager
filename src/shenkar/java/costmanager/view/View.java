@@ -13,12 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.util.List;
 
 public class View implements IView {
@@ -26,7 +23,6 @@ public class View implements IView {
     private ApplicationUI ui;
     private final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
             .appendPattern("yyyy-MM-dd HH:mm:ss")
-            .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
             .toFormatter();
 
     /**
@@ -51,6 +47,7 @@ public class View implements IView {
     /**
      * Calls for the updateTable() method in order to update the table
      * of the expense items.
+     *
      * @param cs - list of expense item to display in the table.
      */
     public void displayExpenseTable(List<Expense> cs) {
@@ -71,6 +68,7 @@ public class View implements IView {
 
     /**
      * Display the categories in the select drop list of "Add Cost Panel".
+     *
      * @param catNames
      */
     public void displayCategoriesSelect(ExpenseCategory[] catNames) {
@@ -79,18 +77,11 @@ public class View implements IView {
 
     /**
      * Display the currencies in the select drop list of "Add Cost Panel".
+     *
      * @param currencies
      */
     public void displayCurrenciesSelect(String[] currencies) {
         View.this.ui.updateCurrenciesSelect(currencies);
-    }
-
-    /**
-     * Display the message in the home screen.
-     * @param message
-     */
-    public void showMessage(String message) {
-        this.ui.updateMessageBoard(message);
     }
 
 
@@ -114,7 +105,6 @@ public class View implements IView {
         private final AddCategoryPanel addCategoryPanel;
         private final DatesChoosePanel dateChoosePanel;
         private final TablePanel tablePanel;
-        private PieChartPanel chartPanel;
 
         public ApplicationUI() {
 
@@ -124,7 +114,6 @@ public class View implements IView {
             addCategoryPanel = new AddCategoryPanel();
             dateChoosePanel = new DatesChoosePanel();
             tablePanel = new TablePanel();
-            chartPanel = new PieChartPanel();
 
             //General common components setup
             frame = new JFrame("CostManager");
@@ -145,15 +134,14 @@ public class View implements IView {
          * The following methods are used by the View outer class in order to pass the data
          * to a specific panel.
          */
-        public void updateMessageBoard(String message) {
-            mainPanel.updateMessageBoard(message);
-        }
         public void updateTable(String[][] table) {
             this.tablePanel.updateTableData(table);
         }
+
         public void updateCategoriesSelect(ExpenseCategory[] catNames) {
             this.addCostPanel.updateCategories(catNames);
         }
+
         public void updateCurrenciesSelect(String[] currencies) {
             this.addCostPanel.updateCurrencies(currencies);
         }
@@ -162,6 +150,7 @@ public class View implements IView {
         public void start() {
             displayMainMenu();
         }
+
         /**
          * Sets the screen to be the main panel, this method called
          * in the start() method when the application starts running.
@@ -173,6 +162,7 @@ public class View implements IView {
         /**
          * Removes the current panel, and then repainting in order to replace it
          * with the next desired panel.
+         *
          * @param next - the panel show next in the application.
          */
         public void replaceScreen(JPanel next) {
@@ -196,12 +186,8 @@ public class View implements IView {
             //Buttons for navigating to other panels of the application
             private JButton btAddCostItem;
             private JButton btAddCategory;
-            private JButton btDisplayBetweenDates;
             private JButton btDisplayTable;
 
-            //Used to display messages to the user
-            private JLabel jlMessage;
-            private JTextArea taMessage;
 
             public MainPanel() {
                 setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -218,23 +204,15 @@ public class View implements IView {
 
                 btAddCostItem = new JButton("Add Cost");
                 btAddCategory = new JButton("Add Category");
-                btDisplayBetweenDates = new JButton("Display expenses between dates");
-                btDisplayTable = new JButton("Display Table");
+                btDisplayTable = new JButton("Get report");
 
-                jlMessage = new JLabel("Message Board");
-                taMessage = new JTextArea(7, 40);
-                taMessage.setEditable(false);
-                JScrollPane scroll = new JScrollPane(taMessage);
 
                 JPanel buttons = new JPanel(new GridBagLayout());
                 JPanel messageBoard = new JPanel(new GridBagLayout());
 
                 buttons.add(btAddCostItem, gbc);
                 buttons.add(btAddCategory, gbc);
-                buttons.add(btDisplayBetweenDates, gbc);
                 buttons.add(btDisplayTable, gbc);
-                messageBoard.add(jlMessage, gbc);
-                messageBoard.add(scroll, gbc);
 
                 //Sends the user to the AddCostItem panel when pressed on Add Cost Item button
                 btAddCostItem.addActionListener(new ActionListener() {
@@ -266,24 +244,12 @@ public class View implements IView {
                     }
                 });
 
-                //Sends the user to the select dates panel when pressed on Display Pie Chart button
-                btDisplayBetweenDates.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        ApplicationUI.this.dateChoosePanel.cleanInputs();
-                        ApplicationUI.this.dateChoosePanel.updateButton("Expeneses between dates");
-                        ApplicationUI.this.replaceScreen(ApplicationUI.this.dateChoosePanel);
-                    }
-                });
 
                 gbc.weighty = 1;
                 this.add(buttons, gbc);
                 this.add(messageBoard, gbc);
             }
 
-            public void updateMessageBoard(String message) {
-                this.taMessage.append(message + "\n");
-            }
         }
 
         /**
@@ -348,7 +314,7 @@ public class View implements IView {
 
                         Currency currencyEnum;
                         switch (currencyStr) {
-                            case "ILS":
+                            case "NIS":
                                 currencyEnum = Currency.NIS;
                                 break;
                             case "USD":
@@ -364,16 +330,11 @@ public class View implements IView {
 
                         try {
                             //Trying to add data to DB
-                            DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                                    .appendPattern("yyyy-MM-dd HH:mm:ss")
-                                    .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
-                                    .toFormatter();
                             LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
                             Expense cs = new Expense(category, amount, currencyEnum, description, dateTime);
                             View.this.vm.addCostItem(cs);
                         } catch (CostManagerException err) {
-
-                            View.this.ui.updateMessageBoard(err.getMessage());
+                            err.printStackTrace();
                         }
 
                         //Rendering the Main Panel window.
@@ -418,11 +379,6 @@ public class View implements IView {
                 tfEnterDescription.setFont(myFont);
 
                 //Setting a format for the date field in the form
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                //DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                        //.appendPattern("yyyy-MM-dd HH:mm:ss")
-                        //.appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
-                        //.toFormatter();
                 jlDate = new JLabel("Enter date (yyyy-MM-dd HH:mm:ss):");
                 tfDate = new JFormattedTextField(formatter);
                 tfDate.setFont(myFont);
@@ -459,6 +415,7 @@ public class View implements IView {
 
             /**
              * Updates the values of the select drop list of the categories
+             *
              * @param catNames
              */
             public void updateCategories(ExpenseCategory[] catNames) {
@@ -475,6 +432,7 @@ public class View implements IView {
 
             /**
              * Updates the values of the select drop list of the currencies
+             *
              * @param currencies
              */
             public void updateCurrencies(String[] currencies) {
@@ -591,9 +549,9 @@ public class View implements IView {
         }
 
         /**
-         * This panel is used to choose dates (from, to) for the table and pie chart panels,
+         * This panel is used to choose dates (from, to) for the table panel,
          * it is a form of only two fields, depending on the submit button text it will call
-         * the next panel (Table, Pie Chart).
+         * the next panel (Table).
          * All the setup of the panel including the event listeners are in the constructor.
          */
         class DatesChoosePanel extends JPanel {
@@ -639,11 +597,6 @@ public class View implements IView {
                     //reading dates from text box
                     String fromDate = tfFromDate.getText();
                     String toDate = tfToDate.getText();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                    //DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                            //.appendPattern("yyyy-MM-dd HH:mm:ss")
-                            //.appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
-                            //.toFormatter();
 
                     if (buttonName.equals("table")) {
                         //sending dates to viewmodel to query the model and present the data in the app
@@ -672,11 +625,6 @@ public class View implements IView {
                 Font myFont = new Font("Default", Font.PLAIN, 12);
 
                 //Setting a format to the date fields
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                //DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                        //.appendPattern("yyyy-MM-dd HH:mm:ss")
-                        //.appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
-                        //.toFormatter();
                 tfFromDate = new JFormattedTextField(formatter);
                 tfToDate = new JFormattedTextField(formatter);
                 tfFromDate.setFont(myFont);
@@ -766,6 +714,7 @@ public class View implements IView {
             /**
              * Updates the data in the table with costs items,
              * then adding the table to the table's panel.
+             *
              * @param data - the data needed to be filled in the table.
              */
             public void updateTableData(String[][] data) {
@@ -783,58 +732,7 @@ public class View implements IView {
             }
         }
 
-        /**
-         * This panel is used to display the pie chart filled with categories and sums data.
-         * The setup of the panel and the event listeners happens in the constructor,
-         * while the filling of the pie chart happens in the method updateChart().
-         */
-        class PieChartPanel extends JPanel {
-            private GridBagConstraints gbc;
-            private JButton btBackToMainMenu;
-            private JLabel jlHeader;
-            //The panel that holds the chart
-            private JPanel chart;
-
-            public PieChartPanel() {
-                setBorder(new EmptyBorder(10, 10, 10, 10));
-                setLayout(new GridBagLayout());
-                gbc = new GridBagConstraints();
-                gbc.gridwidth = GridBagConstraints.REMAINDER;
-                gbc.insets = new Insets(5, 5, 5, 5);
-
-                JPanel homePanel = new JPanel(new GridBagLayout());
-                btBackToMainMenu = new JButton("Home");
-                gbc.weightx = 1;
-                gbc.anchor = GridBagConstraints.WEST;
-                homePanel.add(btBackToMainMenu, gbc);
-                add(homePanel, gbc);
-
-                //Sends the user back to the home screen (MainPanel)
-                btBackToMainMenu.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        ApplicationUI.this.replaceScreen(ApplicationUI.this.mainPanel);
-                    }
-                });
-
-                gbc.weightx = 0;
-                JPanel headerPanel = new JPanel(new GridBagLayout());
-                jlHeader = new JLabel("<html><h1><strong><i>Pie chart for category sum:</i></strong></h1><hr></html>");
-                gbc.anchor = GridBagConstraints.CENTER;
-                headerPanel.add(jlHeader, gbc);
-                add(headerPanel, gbc);
-
-                //Creating the panel that will hold our pie chart
-                chart = new JPanel(new GridBagLayout());
-
-                gbc.fill = GridBagConstraints.BOTH;
-                gbc.weighty = 1;
-                add(chart, gbc);
-                gbc.weighty = 0;
-            }
-        }
     }
-
 
 
 }

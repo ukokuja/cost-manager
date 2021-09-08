@@ -17,7 +17,6 @@ public interface IView {
     public abstract void displayCategoriesSelect(ExpenseCategory[] catNames);
     public abstract void displayCurrenciesSelect(String[] currencies);
 
-    public abstract void showMessage(String message);
     public abstract void setViewModel(IViewModel vm);
 
 }

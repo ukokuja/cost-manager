@@ -55,17 +55,11 @@ public class ViewModel implements IViewModel {
         pool.submit(new Runnable() {
             @Override
             public void run() {
-                String message = "";
                 try {
                     //Add the category to db by calling the model
                     model.addExpenseCategory(category);
-                    //If the operation was done successfully show this message
-                    message = "Category: " + category.toString() + "  was added successfully";
                 } catch (CostManagerException e) {
-                    //If we couldn't add the category to the db, show this message
-                    message = "Error adding " + category.toString() + " category";
-                } finally {
-                    view.showMessage(message);
+                    e.printStackTrace();
                 }
             }
         });
@@ -82,18 +76,11 @@ public class ViewModel implements IViewModel {
         pool.submit(new Runnable() {
             @Override
             public void run() {
-                String message = "";
                 try {
                     //Add the cost item to db by calling the model
-                    model.createExpensessTable();
                     model.addExpense(item);
-                    //If the operation was done successfully show this message
-                    message = "New cost: " + item.toString() + "  was added successfully";
                 } catch (CostManagerException e) {
-                    //If we couldn't add the cost item to the db, show this message
-                    message = "Error with cost item:  " + item.toString();
-                } finally {
-                    view.showMessage(message);
+                    e.printStackTrace();
                 }
             }
         });
